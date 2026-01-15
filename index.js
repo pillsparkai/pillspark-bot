@@ -459,8 +459,22 @@ app.post('/webhook', async (req, res) => {
         res.sendStatus(200);
     } else res.sendStatus(404);
 });
+// ... (பழைய வரிகள்)
+
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
+// 👇 நாம் இப்போது சேர்த்தது இங்கே வர வேண்டும் 👇
+app.get('/api/stats', async (req, res) => {
+    try {
+        const totalUsers = await User.countDocuments();
+        const allUsers = await User.find();
+        let totalReminders = 0;
+        allUsers.forEach(u => totalReminders += u.medicines.length);
+        const logs = await ReminderLog.find().sort({ sentAt: -1 }).limit(5);
+        res.json({ users: totalUsers, reminders: totalReminders, uptime: process.uptime(), recentLogs: logs });
+    } catch (error) { res.status(500).json({ error: 'Data fetch failed' }); }
 });
 app.get('/', (req, res) => res.json({ status: 'Online', service: 'PillSpark Pro (Free Month)' }));
 const PORT = process.env.PORT || 5000;
