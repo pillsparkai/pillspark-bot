@@ -1,11 +1,11 @@
 require('dotenv').config();
+const path = require('path');
 const express = require('express');
 const axios = require('axios');
 const mongoose = require('mongoose');
 const schedule = require('node-schedule');
 const crypto = require('crypto');
 const bodyParser = require('body-parser');
-
 const app = express();
 
 // Middleware
@@ -458,6 +458,9 @@ app.post('/webhook', async (req, res) => {
         for (const entry of body.entry || []) { for (const change of entry.changes || []) { if (change.field === 'messages') { for (const msg of change.value.messages || []) await handleIncomingMessage(msg.from, msg); } } }
         res.sendStatus(200);
     } else res.sendStatus(404);
+});
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin.html'));
 });
 app.get('/', (req, res) => res.json({ status: 'Online', service: 'PillSpark Pro (Free Month)' }));
 const PORT = process.env.PORT || 5000;
