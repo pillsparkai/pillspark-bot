@@ -459,23 +459,71 @@ app.post('/webhook', async (req, res) => {
         res.sendStatus(200);
     } else res.sendStatus(404);
 });
-// ... (பழைய வரிகள்)
+// ---------------- ADMIN DASHBOARD ROUTES ----------------
 
+// 1. Admin Page Load
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'admin.html'));
 });
 
-// 👇 நாம் இப்போது சேர்த்தது இங்கே வர வேண்டும் 👇
+// 2. Dashboard Stats API (இதுதான் மிஸ் ஆகி இருந்தது!)
 app.get('/api/stats', async (req, res) => {
     try {
         const totalUsers = await User.countDocuments();
         const allUsers = await User.find();
         let totalReminders = 0;
         allUsers.forEach(u => totalReminders += u.medicines.length);
+        
         const logs = await ReminderLog.find().sort({ sentAt: -1 }).limit(5);
-        res.json({ users: totalUsers, reminders: totalReminders, uptime: process.uptime(), recentLogs: logs });
-    } catch (error) { res.status(500).json({ error: 'Data fetch failed' }); }
+        
+        res.json({
+            users: totalUsers,
+            reminders: totalReminders,
+            uptime: process.uptime(),
+            recentLogs: logs
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Data fetch failed' });
+    }
 });
+
+// 3. Get All Users List (New)
+app.get('/api/users', async (req, res) => {
+    try {
+        const users = await User.find().sort({ createdAt: -1 });
+        res.json(users);
+    } catch (e) { res.status(500).json({ error: 'Failed' }); }
+});
+
+// 4. Get Single User Details (New)
+app.get('/api/user/:phone', async (req, res) => {
+    try {
+        const user = await User.findOne({ phone: req.params.phone });
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        res.json(user);
+    } catch (e) { res.status(500).json({ error: 'Failed' }); }
+});
+
+// 5. Send Message (New)
+app.post('/api/send-message', async (req, res) => {
+    const { type, target, message } = req.body;
+    try {
+        if (type === 'all') {
+            const users = await User.find();
+            let count = 0;
+            for (const u of users) {
+                await sendTextMessage(u.phone, `📢 *Admin Update:*\n\n${message}`);
+                count++;
+            }
+            res.json({ success: true, count });
+        } else if (type === 'single') {
+            await sendTextMessage(target, `📢 *Message from Admin:*\n\n${message}`);
+            res.json({ success: true });
+        }
+    } catch (e) { res.status(500).json({ error: 'Failed to send' }); }
+});
+
+// ---------------- SERVER START ----------------
 app.get('/', (req, res) => res.json({ status: 'Online', service: 'PillSpark Pro (Free Month)' }));
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

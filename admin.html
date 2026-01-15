@@ -3,141 +3,221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PillSpark AI | Admin Console</title>
+    <title>PillSpark Super Admin</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #4F46E5; --bg: #F3F4F6; --card: #ffffff; --text: #1F2937; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg); margin: 0; padding: 0; color: var(--text); }
+        :root { --primary: #6366F1; --bg: #F3F4F6; --text: #1F2937; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
         /* Sidebar */
-        .sidebar { width: 250px; background: #111827; height: 100vh; position: fixed; color: white; padding: 20px; box-sizing: border-box; }
-        .logo { font-size: 24px; font-weight: bold; margin-bottom: 40px; color: #6366F1; display: flex; align-items: center; gap: 10px; }
-        .menu-item { padding: 15px; border-radius: 8px; cursor: pointer; transition: 0.3s; color: #9CA3AF; display: flex; align-items: center; gap: 10px; }
+        .sidebar { width: 260px; background: #111827; color: white; padding: 20px; display: flex; flex-direction: column; }
+        .logo { font-size: 22px; font-weight: bold; margin-bottom: 40px; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+        .menu-item { padding: 15px; margin-bottom: 5px; border-radius: 8px; cursor: pointer; color: #9CA3AF; display: flex; align-items: center; gap: 12px; transition: 0.3s; }
         .menu-item:hover, .menu-item.active { background: #374151; color: white; }
         
-        /* Main Content */
-        .main { margin-left: 250px; padding: 40px; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .status-badge { background: #D1FAE5; color: #065F46; padding: 5px 15px; border-radius: 20px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 5px; }
-        .dot { width: 8px; height: 8px; background: #059669; border-radius: 50%; animation: pulse 2s infinite; }
+        /* Main Area */
+        .main { flex: 1; padding: 30px; overflow-y: auto; }
+        .section { display: none; animation: fadeIn 0.3s; }
+        .section.active { display: block; }
         
-        /* Cards */
+        /* Cards & Tables */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .card { background: var(--card); padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: transform 0.2s; }
-        .card:hover { transform: translateY(-5px); }
-        .card-title { font-size: 14px; color: #6B7280; margin-bottom: 10px; }
-        .card-value { font-size: 32px; font-weight: bold; color: #111827; }
-        .icon-box { float: right; font-size: 24px; opacity: 0.2; }
-
-        /* Table */
-        .table-container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        h3 { margin-top: 0; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .table-container { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { text-align: left; color: #6B7280; font-size: 12px; padding-bottom: 15px; border-bottom: 1px solid #E5E7EB; }
-        td { padding: 15px 0; border-bottom: 1px solid #F3F4F6; font-size: 14px; }
-        .refresh-btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #E5E7EB; font-size: 14px; }
+        th { color: #6B7280; font-size: 12px; text-transform: uppercase; }
         
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-        @media (max-width: 768px) { .sidebar { width: 70px; padding: 10px; } .menu-item span, .logo span { display: none; } .main { margin-left: 70px; } }
+        /* Buttons */
+        .btn { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-green { background: #10B981; color: white; }
+        .btn-blue { background: #3B82F6; color: white; }
+        .btn:hover { opacity: 0.9; }
+
+        /* Modal (Popup) */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: white; width: 500px; padding: 25px; border-radius: 12px; position: relative; animation: slideUp 0.3s; }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 20px; cursor: pointer; color: #6B7280; }
+        textarea { width: 100%; height: 100px; padding: 10px; margin: 15px 0; border: 1px solid #D1D5DB; border-radius: 6px; resize: none; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <div class="logo"><i class="fas fa-robot"></i> <span>PillSpark</span></div>
-        <div class="menu-item active"><i class="fas fa-home"></i> <span>Dashboard</span></div>
-        <div class="menu-item"><i class="fas fa-users"></i> <span>Users</span></div>
-        <div class="menu-item"><i class="fas fa-cog"></i> <span>Settings</span></div>
+        <div class="logo"><i class="fas fa-robot"></i> PillSpark Pro</div>
+        <div class="menu-item active" onclick="showSection('dashboard', this)"><i class="fas fa-chart-pie"></i> Dashboard</div>
+        <div class="menu-item" onclick="showSection('users', this)"><i class="fas fa-users"></i> Users List</div>
+        <div class="menu-item" onclick="showSection('broadcast', this)"><i class="fas fa-bullhorn"></i> Broadcast</div>
     </div>
 
     <div class="main">
-        <div class="header">
-            <div>
-                <h1>Dashboard Overview</h1>
-                <p style="color: #6B7280; margin: 0;">Welcome back, CEO.</p>
-            </div>
-            <div class="status-badge"><div class="dot"></div> System Online</div>
-        </div>
-
-        <div class="grid">
-            <div class="card" style="border-left: 4px solid #4F46E5;">
-                <div class="icon-box" style="color: #4F46E5;"><i class="fas fa-users"></i></div>
-                <div class="card-title">TOTAL USERS</div>
-                <div class="card-value" id="userCount">Loading...</div>
-            </div>
-            <div class="card" style="border-left: 4px solid #10B981;">
-                <div class="icon-box" style="color: #10B981;"><i class="fas fa-pills"></i></div>
-                <div class="card-title">ACTIVE REMINDERS</div>
-                <div class="card-value" id="reminderCount">Loading...</div>
-            </div>
-            <div class="card" style="border-left: 4px solid #F59E0B;">
-                <div class="icon-box" style="color: #F59E0B;"><i class="fas fa-clock"></i></div>
-                <div class="card-title">UPTIME (Seconds)</div>
-                <div class="card-value" id="uptime">Loading...</div>
+        
+        <div id="dashboard" class="section active">
+            <h1>Dashboard Overview</h1>
+            <div class="grid">
+                <div class="card"><h3>Total Users</h3><h1 id="d-users">Loading...</h1></div>
+                <div class="card"><h3>Active Reminders</h3><h1 id="d-reminders">Loading...</h1></div>
+                <div class="card"><h3>System Uptime</h3><h1 id="d-uptime">Loading...</h1></div>
             </div>
         </div>
 
-        <div class="table-container">
+        <div id="users" class="section">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h3>Recent Activity Logs</h3>
-                <button class="refresh-btn" onclick="fetchStats()"><i class="fas fa-sync-alt"></i> Refresh Data</button>
+                <h1>All Users</h1>
+                <button class="btn btn-primary" onclick="loadUsers()"><i class="fas fa-sync"></i> Refresh</button>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>TIME</th>
-                        <th>USER PHONE</th>
-                        <th>MEDICINE</th>
-                        <th>STATUS</th>
-                    </tr>
-                </thead>
-                <tbody id="logTable">
-                    <tr><td colspan="4">Loading data...</td></tr>
-                </tbody>
-            </table>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Name</th><th>Phone</th><th>Language</th><th>Medicines</th><th>Actions</th></tr></thead>
+                    <tbody id="usersTableBody"><tr><td colspan="5">Loading...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="broadcast" class="section">
+            <h1>📢 Broadcast Message</h1>
+            <div class="card" style="max-width: 600px;">
+                <p>Send a WhatsApp message to <b>ALL users</b> instantly.</p>
+                <textarea id="broadcastMsg" placeholder="Type your message here..."></textarea>
+                <button class="btn btn-primary" onclick="sendBroadcast()">🚀 Send to Everyone</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('userModal')">&times;</span>
+            <h2 id="m-name">User Details</h2>
+            <p><b>Phone:</b> <span id="m-phone"></span></p>
+            <hr>
+            <h3>💊 Medicines:</h3>
+            <ul id="m-meds" style="padding-left: 20px;"></ul>
+            <hr>
+            <h3>💬 Send Private Message:</h3>
+            <textarea id="privateMsg" placeholder="Message to this user..." style="height: 60px;"></textarea>
+            <button class="btn btn-blue" onclick="sendPrivateMsg()">Send Message</button>
         </div>
     </div>
 
     <script>
-        async function fetchStats() {
-            try {
-                const response = await fetch('/api/stats');
-                const data = await response.json();
-                
-                // Update Cards
-                document.getElementById('userCount').innerText = data.users;
-                document.getElementById('reminderCount').innerText = data.reminders;
-                document.getElementById('uptime').innerText = Math.floor(data.uptime) + 's';
+        let currentUserPhone = '';
 
-                // Update Table
-                const tbody = document.getElementById('logTable');
-                tbody.innerHTML = '';
-                
-                if(data.recentLogs.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4">No recent activity found.</td></tr>';
-                } else {
-                    data.recentLogs.forEach(log => {
-                        const date = new Date(log.sentAt).toLocaleTimeString();
-                        let statusColor = log.status === 'TAKEN' ? 'green' : (log.status === 'PENDING' ? 'orange' : 'red');
-                        
-                        const row = `<tr>
-                            <td>${date}</td>
-                            <td>${log.userId.replace(/.(?=.{4})/g, '*')}</td> <td>${log.medicineName}</td>
-                            <td style="color:${statusColor}; font-weight:bold;">${log.status}</td>
-                        </tr>`;
-                        tbody.innerHTML += row;
-                    });
-                }
-            } catch (error) {
-                console.error('Error:', error);
+        // Navigation Logic
+        function showSection(id, btn) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(btn) {
+                document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+                btn.classList.add('active');
             }
+            if(id === 'users') loadUsers();
+            if(id === 'dashboard') loadStats();
         }
 
-        // Auto load on start
-        fetchStats();
-        // Auto refresh every 10 seconds
-        setInterval(fetchStats, 10000);
+        // Fetch Dashboard Stats
+        async function loadStats() {
+            try {
+                const res = await fetch('/api/stats');
+                const data = await res.json();
+                document.getElementById('d-users').innerText = data.users || 0;
+                document.getElementById('d-reminders').innerText = data.reminders || 0;
+                document.getElementById('d-uptime').innerText = Math.floor(data.uptime || 0) + 's';
+            } catch(e) { console.error(e); }
+        }
+
+        // Fetch Users List
+        async function loadUsers() {
+            try {
+                const res = await fetch('/api/users');
+                const users = await res.json();
+                const tbody = document.getElementById('usersTableBody');
+                tbody.innerHTML = '';
+                
+                if(users.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5">No users found.</td></tr>';
+                    return;
+                }
+
+                users.forEach(u => {
+                    const row = `<tr>
+                        <td><b>${u.name}</b></td>
+                        <td>${u.phone}</td>
+                        <td>${(u.language || 'en').toUpperCase()}</td>
+                        <td>${u.medicines ? u.medicines.length : 0} Active</td>
+                        <td>
+                            <button class="btn btn-blue" onclick="openUser('${u.phone}')">View & Message</button>
+                        </td>
+                    </tr>`;
+                    tbody.innerHTML += row;
+                });
+            } catch(e) { console.error(e); }
+        }
+
+        // Open User Details
+        async function openUser(phone) {
+            currentUserPhone = phone;
+            try {
+                const res = await fetch(`/api/user/${phone}`);
+                const u = await res.json();
+                
+                document.getElementById('m-name').innerText = u.name;
+                document.getElementById('m-phone').innerText = u.phone;
+                
+                const medList = document.getElementById('m-meds');
+                medList.innerHTML = '';
+                if(!u.medicines || u.medicines.length === 0) medList.innerHTML = '<li>No medicines set.</li>';
+                else {
+                    u.medicines.forEach(m => {
+                        medList.innerHTML += `<li><b>${m.name}</b> at ${m.time}</li>`;
+                    });
+                }
+                document.getElementById('userModal').style.display = 'flex';
+            } catch(e) { alert("Error fetching user details"); }
+        }
+
+        // Send Private Message
+        async function sendPrivateMsg() {
+            const msg = document.getElementById('privateMsg').value;
+            if(!msg) return alert("Type a message!");
+            
+            await fetch('/api/send-message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: 'single', target: currentUserPhone, message: msg })
+            });
+            alert("Message Sent!");
+            document.getElementById('privateMsg').value = '';
+        }
+
+        // Send Broadcast
+        async function sendBroadcast() {
+            const msg = document.getElementById('broadcastMsg').value;
+            if(!msg) return alert("Type a message!");
+            if(!confirm("Are you sure you want to send this to ALL users?")) return;
+
+            const btn = document.querySelector('#broadcast button');
+            btn.innerText = "Sending...";
+            
+            await fetch('/api/send-message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: 'all', message: msg })
+            });
+            alert("Broadcast Sent!");
+            btn.innerText = "🚀 Send to Everyone";
+            document.getElementById('broadcastMsg').value = '';
+        }
+
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        
+        // Initial Load
+        loadStats();
     </script>
 </body>
 </html>
