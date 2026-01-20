@@ -522,6 +522,18 @@ app.post('/api/send-message', async (req, res) => {
         }
     } catch (e) { res.status(500).json({ error: 'Failed to send' }); }
 });
+// 👇👇👇 FEEDBACK API (Add this below /api/send-message) 👇👇👇
+
+// 6. Get Feedbacks
+app.get('/api/feedbacks', async (req, res) => {
+    try {
+        // Fetch last 50 feedbacks, newest first
+        const feedbacks = await Feedback.find().sort({ date: -1 }).limit(50);
+        res.json(feedbacks);
+    } catch (e) { res.status(500).json({ error: 'Failed' }); }
+});
+
+// 👆👆👆 End of Feedback API 👆👆👆
 
 // ---------------- SERVER START ----------------
 app.get('/', (req, res) => res.json({ status: 'Online', service: 'PillSpark Pro (Free Month)' }));

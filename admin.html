@@ -10,58 +10,57 @@
         :root { --primary: #6366F1; --bg: #F3F4F6; --text: #1F2937; --sidebar: #111827; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; color: var(--text); }
         
-        /* --- LOGIN PAGE STYLES --- */
+        /* LOGIN */
         .login-wrapper { height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%); }
-        .login-box { width: 350px; background: white; padding: 40px; border-radius: 16px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); text-align: center; }
-        .login-box h2 { color: #333; margin-bottom: 20px; font-weight: 700; }
-        .login-box input { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #E5E7EB; border-radius: 8px; box-sizing: border-box; outline: none; transition: 0.3s; }
-        .login-box input:focus { border-color: var(--primary); }
-        .login-box button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px; transition: 0.3s; }
-        .login-box button:hover { background: #4F46E5; }
+        .login-box { width: 350px; background: white; padding: 40px; border-radius: 16px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); text-align: center; }
+        .login-box input { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #E5E7EB; border-radius: 8px; box-sizing: border-box; }
+        .login-box button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
         .error { color: #EF4444; font-size: 14px; margin-top: 10px; display: none; }
 
-        /* --- DASHBOARD STYLES --- */
-        .app-container { display: none; height: 100vh; overflow: hidden; display: flex; } /* Hidden by default */
-        
-        /* Sidebar */
+        /* APP LAYOUT */
+        .app-container { display: none; height: 100vh; overflow: hidden; display: flex; }
         .sidebar { width: 260px; background: var(--sidebar); color: white; padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; }
         .logo { font-size: 22px; font-weight: bold; margin-bottom: 40px; color: var(--primary); display: flex; align-items: center; gap: 10px; }
         .menu-item { padding: 15px; margin-bottom: 5px; border-radius: 8px; cursor: pointer; color: #9CA3AF; display: flex; align-items: center; gap: 12px; transition: 0.3s; }
         .menu-item:hover, .menu-item.active { background: #374151; color: white; }
         .logout-btn { margin-top: auto; background: #EF4444; color: white; text-align: center; justify-content: center; }
-        .logout-btn:hover { background: #DC2626; }
 
-        /* Main Area */
         .main { flex: 1; padding: 30px; overflow-y: auto; background: var(--bg); }
         .section { display: none; animation: fadeIn 0.3s; }
         .section.active { display: block; }
         
-        /* Cards */
+        /* CARDS & TABLES */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 4px solid var(--primary); }
-        .card h3 { color: #6B7280; font-size: 14px; text-transform: uppercase; margin-top: 0; }
-        .card h1 { margin: 10px 0 0 0; font-size: 32px; color: #111827; }
-
-        /* Tables */
         .table-container { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid #E5E7EB; font-size: 14px; white-space: nowrap; }
         th { color: #6B7280; font-size: 12px; text-transform: uppercase; font-weight: 600; }
         tr:hover { background-color: #F9FAFB; }
 
-        /* Buttons & Inputs */
+        /* BUTTONS */
         .btn { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; display: inline-flex; align-items: center; gap: 5px; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-blue { background: #3B82F6; color: white; }
-        .btn:hover { opacity: 0.9; }
-        textarea { width: 100%; height: 100px; padding: 12px; border: 1px solid #D1D5DB; border-radius: 8px; resize: none; font-family: inherit; margin-bottom: 15px; }
+        .btn-green { background: #10B981; color: white; }
+        textarea { width: 100%; height: 100px; padding: 12px; border: 1px solid #D1D5DB; border-radius: 8px; resize: none; margin-bottom: 15px; }
 
-        /* Modal */
+        /* MODAL (SCROLL FIX HERE) */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
-        .modal-content { background: white; width: 500px; padding: 30px; border-radius: 16px; position: relative; animation: slideUp 0.3s; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .modal-content { 
+            background: white; 
+            width: 500px; 
+            padding: 30px; 
+            border-radius: 16px; 
+            position: relative; 
+            animation: slideUp 0.3s;
+            /* 👇 SCROLL FIX 👇 */
+            max-height: 85vh; 
+            overflow-y: auto; 
+            /* 👆 SCROLL FIX 👆 */
+        }
         .close-btn { position: absolute; top: 20px; right: 20px; font-size: 24px; cursor: pointer; color: #9CA3AF; }
-        .close-btn:hover { color: #111827; }
-        
+
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
@@ -70,7 +69,6 @@
 
     <div id="loginScreen" class="login-wrapper">
         <div class="login-box">
-            <div style="font-size: 40px; color: var(--primary); margin-bottom: 10px;"><i class="fas fa-user-shield"></i></div>
             <h2>Admin Login</h2>
             <input type="text" id="username" placeholder="Username">
             <input type="password" id="password" placeholder="Password">
@@ -79,12 +77,13 @@
         </div>
     </div>
 
-    <div id="appContainer" class="app-container" style="display: none;">
+    <div id="appContainer" class="app-container">
         
         <div class="sidebar">
             <div class="logo"><i class="fas fa-robot"></i> PillSpark Pro</div>
             <div class="menu-item active" onclick="showSection('dashboard', this)"><i class="fas fa-chart-pie"></i> Dashboard</div>
             <div class="menu-item" onclick="showSection('users', this)"><i class="fas fa-users"></i> Users List</div>
+            <div class="menu-item" onclick="showSection('feedback', this)"><i class="fas fa-comments"></i> Feedback</div>
             <div class="menu-item" onclick="showSection('broadcast', this)"><i class="fas fa-bullhorn"></i> Broadcast</div>
             <div class="menu-item logout-btn" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</div>
         </div>
@@ -92,10 +91,7 @@
         <div class="main">
             
             <div id="dashboard" class="section active">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h1>Dashboard Overview</h1>
-                    <span style="background: #D1FAE5; color: #065F46; padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold;">● System Online</span>
-                </div>
+                <h1>Dashboard Overview</h1>
                 <div class="grid">
                     <div class="card"><h3>Total Users</h3><h1 id="d-users">Loading...</h1></div>
                     <div class="card"><h3>Active Reminders</h3><h1 id="d-reminders">Loading...</h1></div>
@@ -110,17 +106,29 @@
                 </div>
                 <div class="table-container">
                     <table>
-                        <thead><tr><th>Name</th><th>Phone</th><th>Language</th><th>Medicines</th><th>Actions</th></tr></thead>
-                        <tbody id="usersTableBody"><tr><td colspan="5">Loading...</td></tr></tbody>
+                        <thead><tr><th>Name</th><th>Phone</th><th>Meds</th><th>Actions</th></tr></thead>
+                        <tbody id="usersTableBody"><tr><td colspan="4">Loading...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="feedback" class="section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h1>User Feedback & Enquiries</h1>
+                    <button class="btn btn-primary" onclick="loadFeedbacks()"><i class="fas fa-sync"></i> Refresh</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Date</th><th>User</th><th>Message</th><th>Action</th></tr></thead>
+                        <tbody id="feedbackTableBody"><tr><td colspan="4">Loading...</td></tr></tbody>
                     </table>
                 </div>
             </div>
 
             <div id="broadcast" class="section">
                 <h1>📢 Broadcast Message</h1>
-                <div class="card" style="max-width: 600px; border-left: 4px solid #F59E0B;">
-                    <p style="color: #6B7280; margin-bottom: 15px;">Send a WhatsApp message to <b>ALL users</b> instantly.</p>
-                    <textarea id="broadcastMsg" placeholder="Type your message here..."></textarea>
+                <div class="card" style="max-width: 600px;">
+                    <textarea id="broadcastMsg" placeholder="Type message for EVERYONE..."></textarea>
                     <button class="btn btn-primary" onclick="sendBroadcast()">🚀 Send to Everyone</button>
                 </div>
             </div>
@@ -131,25 +139,24 @@
     <div id="userModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('userModal')">&times;</span>
-            <h2 id="m-name" style="margin-top: 0;">User Details</h2>
-            <p style="color: #6B7280;"><b>Phone:</b> <span id="m-phone"></span></p>
-            <hr style="border: 0; border-top: 1px solid #E5E7EB; margin: 20px 0;">
+            <h2 id="m-name">User Details</h2>
+            <p><b>Phone:</b> <span id="m-phone"></span></p>
+            <hr>
             
-            <h3 style="margin-bottom: 10px;">💊 Medicines:</h3>
-            <ul id="m-meds" style="padding-left: 20px; color: #374151; margin-bottom: 20px;"></ul>
+            <h3>💊 Medicines:</h3>
+            <ul id="m-meds" style="padding-left: 20px; margin-bottom: 20px;"></ul>
             
-            <hr style="border: 0; border-top: 1px solid #E5E7EB; margin: 20px 0;">
-            
-            <h3 style="margin-bottom: 10px;">💬 Send Private Message:</h3>
-            <textarea id="privateMsg" placeholder="Message to this user..." style="height: 80px;"></textarea>
+            <hr>
+            <h3>💬 Send Reply / Private Message:</h3>
+            <textarea id="privateMsg" placeholder="Type your message here..." style="height: 80px;"></textarea>
             <button class="btn btn-blue" onclick="sendPrivateMsg()" style="width: 100%;">Send Message</button>
         </div>
     </div>
 
     <script>
-        // --- LOGIN LOGIC ---
         const ADMIN_USER = "admin";
         const ADMIN_PASS = "pillspark@123";
+        let currentUserPhone = '';
 
         function checkSession() {
             if (localStorage.getItem("isAdmin") === "true") {
@@ -163,9 +170,7 @@
         }
 
         function handleLogin() {
-            const u = document.getElementById('username').value;
-            const p = document.getElementById('password').value;
-            if (u === ADMIN_USER && p === ADMIN_PASS) {
+            if (document.getElementById('username').value === ADMIN_USER && document.getElementById('password').value === ADMIN_PASS) {
                 localStorage.setItem("isAdmin", "true");
                 checkSession();
             } else {
@@ -178,17 +183,13 @@
             location.reload();
         }
 
-        // --- DASHBOARD LOGIC ---
-        let currentUserPhone = '';
-
         function showSection(id, btn) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            if(btn) {
-                document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
-                btn.classList.add('active');
-            }
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            if(btn) btn.classList.add('active');
             if(id === 'users') loadUsers();
+            if(id === 'feedback') loadFeedbacks();
             if(id === 'dashboard') loadStats();
         }
 
@@ -199,7 +200,7 @@
                 document.getElementById('d-users').innerText = data.users || 0;
                 document.getElementById('d-reminders').innerText = data.reminders || 0;
                 document.getElementById('d-uptime').innerText = Math.floor(data.uptime || 0) + 's';
-            } catch(e) { console.error("Stats Error:", e); }
+            } catch(e) {}
         }
 
         async function loadUsers() {
@@ -208,91 +209,95 @@
                 const users = await res.json();
                 const tbody = document.getElementById('usersTableBody');
                 tbody.innerHTML = '';
-                
-                if(users.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5">No users found.</td></tr>';
-                    return;
-                }
-
                 users.forEach(u => {
-                    const row = `<tr>
+                    tbody.innerHTML += `<tr>
                         <td><b>${u.name}</b></td>
                         <td>${u.phone}</td>
-                        <td><span style="background:#E0E7FF; color:#4F46E5; padding:2px 8px; border-radius:4px; font-size:12px;">${(u.language || 'en').toUpperCase()}</span></td>
                         <td>${u.medicines ? u.medicines.length : 0} Active</td>
-                        <td>
-                            <button class="btn btn-blue" onclick="openUser('${u.phone}')"><i class="fas fa-eye"></i> View</button>
-                        </td>
+                        <td><button class="btn btn-blue" onclick="openUser('${u.phone}')">View & Message</button></td>
                     </tr>`;
-                    tbody.innerHTML += row;
                 });
-            } catch(e) { console.error("Users Error:", e); }
+            } catch(e) {}
+        }
+
+        async function loadFeedbacks() {
+            try {
+                const res = await fetch('/api/feedbacks');
+                const list = await res.json();
+                const tbody = document.getElementById('feedbackTableBody');
+                tbody.innerHTML = '';
+                if(list.length === 0) tbody.innerHTML = '<tr><td colspan="4">No messages yet.</td></tr>';
+                
+                list.forEach(f => {
+                    tbody.innerHTML += `<tr>
+                        <td>${new Date(f.date).toLocaleDateString()}</td>
+                        <td><b>${f.userName}</b><br><small>${f.userId}</small></td>
+                        <td>${f.message}</td>
+                        <td><button class="btn btn-green" onclick="openReply('${f.userId}', '${f.userName}')"><i class="fas fa-reply"></i> Reply</button></td>
+                    </tr>`;
+                });
+            } catch(e) {}
         }
 
         async function openUser(phone) {
-            currentUserPhone = phone;
+            currentUserPhone = phone; 
             try {
                 const res = await fetch(`/api/user/${phone}`);
                 const u = await res.json();
-                
                 document.getElementById('m-name').innerText = u.name;
                 document.getElementById('m-phone').innerText = u.phone;
-                
                 const medList = document.getElementById('m-meds');
                 medList.innerHTML = '';
                 if(!u.medicines || u.medicines.length === 0) medList.innerHTML = '<li>No medicines set.</li>';
-                else {
-                    u.medicines.forEach(m => {
-                        medList.innerHTML += `<li><b>${m.name}</b> at ${m.time}</li>`;
-                    });
-                }
+                else u.medicines.forEach(m => medList.innerHTML += `<li><b>${m.name}</b> at ${m.time}</li>`);
                 document.getElementById('userModal').style.display = 'flex';
-            } catch(e) { alert("Error fetching user details"); }
+            } catch(e) { alert("Error"); }
+        }
+
+        function openReply(phone, name) {
+            // Re-use the User Modal for replying directly
+            openUser(phone);
+            setTimeout(() => {
+                document.getElementById('privateMsg').focus();
+                document.getElementById('privateMsg').placeholder = `Replying to ${name}...`;
+            }, 500);
         }
 
         async function sendPrivateMsg() {
             const msg = document.getElementById('privateMsg').value;
             if(!msg) return alert("Type a message!");
-            
+            if(!currentUserPhone) return alert("Error: User phone not found.");
+
             const btn = document.querySelector('#userModal .btn-blue');
-            const originalText = btn.innerText;
             btn.innerText = "Sending...";
             
             try {
-                await fetch('/api/send-message', {
+                const res = await fetch('/api/send-message', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ type: 'single', target: currentUserPhone, message: msg })
                 });
-                alert("Message Sent!");
-                document.getElementById('privateMsg').value = '';
-            } catch(e) { alert("Failed to send"); }
-            btn.innerText = originalText;
+                const d = await res.json();
+                if(d.success) { alert("Message Sent!"); document.getElementById('privateMsg').value = ''; }
+                else alert("Failed to send.");
+            } catch(e) { alert("Network Error"); }
+            btn.innerText = "Send Message";
         }
 
         async function sendBroadcast() {
             const msg = document.getElementById('broadcastMsg').value;
             if(!msg) return alert("Type a message!");
-            if(!confirm("Are you sure you want to send this to ALL users?")) return;
-
-            const btn = document.querySelector('#broadcast button');
-            btn.innerText = "Sending...";
-            
-            try {
-                await fetch('/api/send-message', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ type: 'all', message: msg })
-                });
-                alert("Broadcast Sent!");
-                document.getElementById('broadcastMsg').value = '';
-            } catch(e) { alert("Failed to send"); }
-            btn.innerText = "🚀 Send to Everyone";
+            if(!confirm("Send to EVERYONE?")) return;
+            await fetch('/api/send-message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: 'all', message: msg })
+            });
+            alert("Sent!");
+            document.getElementById('broadcastMsg').value = '';
         }
 
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        
-        // Initialize
         checkSession();
     </script>
 </body>
