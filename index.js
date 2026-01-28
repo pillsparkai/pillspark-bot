@@ -45,7 +45,7 @@ const locales = {
         btn_add: "➕ Add Medicine",
         btn_view: "📋 View Schedule",
         btn_del: "🗑️ Delete Medicine",
-        btn_sub: "🎁 Offer Status", // Changed Name
+        btn_sub: "🎁 Offer Status",
         btn_feed: "⭐ Feedback",
         btn_guardian: "👨‍👩‍👦 Change Guardian",
         btn_lang: "🌐 Change Language",
@@ -73,7 +73,7 @@ const locales = {
         btn_add: "➕ மாத்திரை சேர்",
         btn_view: "📋 அட்டவணை பார்",
         btn_del: "🗑️ நீக்கவும்",
-        btn_sub: "🎁 சலுகை விவரம்", // Changed Name
+        btn_sub: "🎁 சலுகை விவரம்",
         btn_feed: "⭐ கருத்து (Feedback)",
         btn_guardian: "👨‍👩‍👦 கார்டியன் மாற்றம்",
         btn_lang: "🌐 மொழி மாற்றம்",
@@ -101,7 +101,7 @@ const locales = {
         btn_add: "➕ दवा जोड़ें",
         btn_view: "📋 शेड्यूल देखें",
         btn_del: "🗑️ दवा हटाएं",
-        btn_sub: "🎁 ऑफ़र स्थिति", // Changed Name
+        btn_sub: "🎁 ऑफ़र स्थिति",
         btn_feed: "⭐ सुझाव (Feedback)",
         btn_guardian: "👨‍👩‍👦 अभिभावक बदलें",
         btn_lang: "🌐 भाषा बदलें",
@@ -129,7 +129,7 @@ const locales = {
         btn_add: "➕ మందులు జోడించు",
         btn_view: "📋 షెడ్యూల్",
         btn_del: "🗑️ తొలగించు",
-        btn_sub: "🎁 ఆఫర్", // Changed Name
+        btn_sub: "🎁 ఆఫర్",
         btn_feed: "⭐ అభిప్రాయం",
         btn_guardian: "👨‍👩‍👦 గార్డియన్‌ని మార్చండి",
         btn_lang: "🌐 భాష మార్చండి",
@@ -157,7 +157,7 @@ const locales = {
         btn_add: "➕ മരുന്ന് ചേർക്കുക",
         btn_view: "📋 സമയം",
         btn_del: "🗑️ നീക്കം",
-        btn_sub: "🎁 ഓഫർ", // Changed Name
+        btn_sub: "🎁 ഓഫർ",
         btn_feed: "⭐ അഭിപ്രായം",
         btn_guardian: "👨‍👩‍👦 ഗാർഡിയനെ മാറ്റുക",
         btn_lang: "🌐 ഭാഷ മാറ്റുക",
@@ -185,11 +185,19 @@ function t(key, lang, params = {}) {
     return text;
 }
 
-// ---------------- DATABASE ----------------
+// ---------------- DATABASE CONNECTION ----------------
 mongoose.connect(MONGODB_URI)
-    .then(() => { console.log('✅ Connected to MongoDB'); initializeScheduledReminders(); startGuardianChecker(); })
+    .then(() => { 
+        console.log('✅ Connected to MongoDB'); 
+        
+        // Start all background services
+        initializeScheduledReminders();
+        startGuardianChecker();
+        startSessionTimeoutChecker();
+    })
     .catch(err => console.error('❌ MongoDB connection error:', err));
 
+// ---------------- SCHEMAS ----------------
 const userSchema = new mongoose.Schema({
     phone: { type: String, required: true, unique: true },
     name: { type: String, default: 'Friend' },
@@ -252,10 +260,6 @@ function scheduleReminder(userPhone, medicine, jobId) {
         
         const lang = currentUser.language || 'en';
         
-        // Subscription Check REMOVED for FREE MONTH
-        // const now = new Date();
-        // const hasActiveSub = currentUser.subscription_end_date && currentUser.subscription_end_date > now;
-        
         try {
             console.log(`⏰ Sending Reminder: ${medicine.name} to ${userPhone}`);
             await sendMedicineReminder(userPhone, medicine.name, medicine.photo_id, currentUser.name, lang);
@@ -283,6 +287,41 @@ function startGuardianChecker() {
             await sendTextMessage(gPhone, `🚨 *Emergency Alert*\n\nYour ward (${data.user}) has NOT taken: *${data.medicines.join(', ')}*.\nPlease call them immediately.`);
         }
     }, 60 * 1000);
+}
+
+function startSessionTimeoutChecker() {
+    // Run this check every 1 minute
+    setInterval(async () => {
+        try {
+            // Set Timeout Limit (e.g., 5 Minutes)
+            const timeoutLimit = new Date(Date.now() - 5 * 60 * 1000); 
+
+            // Find users who are NOT 'IDLE' and haven't updated for 5 mins
+            const inactiveUsers = await User.find({
+                step: { $ne: 'IDLE' }, // Step is NOT IDLE
+                updatedAt: { $lt: timeoutLimit } // Last update was >5 mins ago
+            });
+
+            if (inactiveUsers.length === 0) return;
+
+            console.log(`⏳ Found ${inactiveUsers.length} inactive users. Resetting...`);
+
+            for (const user of inactiveUsers) {
+                // 1. Send the Timeout Message
+                await sendTextMessage(user.phone, "⚠️ *Session Timeout*\n\nYour session has timed out due to inactivity. Please type 'Hi' to go to the welcome message.");
+
+                // 2. Reset the User State
+                user.step = 'IDLE';
+                user.temp_medicine_name = '';
+                user.temp_time = '';
+                user.temp_photo_id = '';
+                
+                await user.save();
+            }
+        } catch (error) {
+            console.error("❌ Session Timeout Error:", error);
+        }
+    }, 60 * 1000); // Check every 60 seconds
 }
 
 async function initializeScheduledReminders() {
@@ -459,6 +498,7 @@ app.post('/webhook', async (req, res) => {
         res.sendStatus(200);
     } else res.sendStatus(404);
 });
+
 // ---------------- ADMIN DASHBOARD ROUTES ----------------
 
 // 1. Admin Page Load
@@ -466,7 +506,7 @@ app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'admin.html'));
 });
 
-// 2. Dashboard Stats API (இதுதான் மிஸ் ஆகி இருந்தது!)
+// 2. Dashboard Stats API
 app.get('/api/stats', async (req, res) => {
     try {
         const totalUsers = await User.countDocuments();
@@ -487,7 +527,7 @@ app.get('/api/stats', async (req, res) => {
     }
 });
 
-// 3. Get All Users List (New)
+// 3. Get All Users List
 app.get('/api/users', async (req, res) => {
     try {
         const users = await User.find().sort({ createdAt: -1 });
@@ -495,7 +535,7 @@ app.get('/api/users', async (req, res) => {
     } catch (e) { res.status(500).json({ error: 'Failed' }); }
 });
 
-// 4. Get Single User Details (New)
+// 4. Get Single User Details
 app.get('/api/user/:phone', async (req, res) => {
     try {
         const user = await User.findOne({ phone: req.params.phone });
@@ -504,7 +544,7 @@ app.get('/api/user/:phone', async (req, res) => {
     } catch (e) { res.status(500).json({ error: 'Failed' }); }
 });
 
-// 5. Send Message (New)
+// 5. Send Message (Broadcast or Single)
 app.post('/api/send-message', async (req, res) => {
     const { type, target, message } = req.body;
     try {
@@ -522,9 +562,8 @@ app.post('/api/send-message', async (req, res) => {
         }
     } catch (e) { res.status(500).json({ error: 'Failed to send' }); }
 });
-// 👇👇👇 FEEDBACK API (Add this below /api/send-message) 👇👇👇
 
-// 6. Get Feedbacks
+// 6. Get Feedbacks (Added Feedback API)
 app.get('/api/feedbacks', async (req, res) => {
     try {
         // Fetch last 50 feedbacks, newest first
@@ -532,8 +571,6 @@ app.get('/api/feedbacks', async (req, res) => {
         res.json(feedbacks);
     } catch (e) { res.status(500).json({ error: 'Failed' }); }
 });
-
-// 👆👆👆 End of Feedback API 👆👆👆
 
 // ---------------- SERVER START ----------------
 app.get('/', (req, res) => res.json({ status: 'Online', service: 'PillSpark Pro (Free Month)' }));
